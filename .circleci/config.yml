@@ -12,11 +12,25 @@ jobs:
       - run:
           name: chmod permissions
           command: chmod +x ./gradlew
-
       - run:
           name: Assemble release build
           command: |
             ./gradlew assembleDebug
+      - run:
+          name: install jq
+          command: |
+            wget http://stedolan.github.io/jq/download/linux64/jq
+            chmod +x ./jq
+            cp jq /usr/bin
+
+      - run:
+          name: Generate Kobiton URL
+          command: |
+            response=$(curl -X POST https://api.kobiton.com/v1/apps/uploadUrl -H 'Authorization: Basic a3Vua2E4MjcxQGdtYWlsLmNvbTo1ZGM2Njk5NS0yMjMxLTQyZjktYjBhYS1iNjk3OTMzZTMwNDI=' -H 'Content-Type: application/json' -H 'Accept: application/json' --data '{"filename":"app-debug.apk","appId":282134}')
+            url=$(echo $response | jq '.url')
+            url=${url%\"}
+            url=${url#\"}
+            curl -T "app/build/outputs/apk/debug/app-debug.apk"  -H "Content-Type: application/octet-stream" -H "x-amz-tagging: unsaved=true" -X PUT $url
       - store_artifacts:
           path: app/build/outputs/apk
           destination: artifact-file
