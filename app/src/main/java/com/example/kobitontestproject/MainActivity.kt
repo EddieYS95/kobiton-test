@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun onClickTestButton (textView: TextView): View.OnClickListener? {
-        textView.text = "clicked test button"
+        textView.text = "clicked test button !!!"
         return null
     }
 }
